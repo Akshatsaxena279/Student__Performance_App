@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-gradient-to-r from-blue-500 to-purple-600 font-poppins">
+    <div class="container mx-auto my-10 p-5">
+        <div class="max-w-2xl mx-auto bg-white/90 p-8 rounded-2xl shadow-2xl backdrop-blur-lg">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800">Student Performance Prediction</h1>
+                <a href="{{ url_for('history') }}" class="bg-white/50 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-white/80 transition">View History</a>
+            </div>
+            <form action="/predict" method="post">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="mb-4">
+                        <label for="student_name" class="block text-gray-700 font-semibold">Student Name</label>
+                        <input type="text" id="student_name" name="student_name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/70" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="attendance" class="block text-gray-700 font-semibold">Attendance (%)</label>
+                        <input type="number" id="attendance" name="attendance" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/70" required min="0" max="100">
+                    </div>
+                    <div class="mb-4">
+                        <label for="study_hours" class="block text-gray-700 font-semibold">Study Hours (per day)</label>
+                        <input type="number" id="study_hours" name="study_hours" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/70" required min="0">
+                    </div>
+                    <div class="mb-4">
+                        <label for="internal_marks" class="block text-gray-700 font-semibold">Internal Marks (out of 30)</label>
+                        <input type="number" id="internal_marks" name="internal_marks" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/70" required min="0" max="30">
+                    </div>
+                    <div class="mb-4">
+                        <label for="assignment_score" class="block text-gray-700 font-semibold">Assignment Score (out of 10)</label>
+                        <input type="number" id="assignment_score" name="assignment_score" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/70" required min="0" max="10">
+                    </div>
+                </div>
+                <div class="text-center mt-6">
+                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-800 transition-transform transform hover:scale-105 shadow-lg">Predict Result</button>
+                </div>
+            </form>
+            {% if prediction_text %}
+            <div id="result" class="mt-8 text-center text-2xl font-bold p-5 rounded-lg {% if 'PASS' in prediction_text %} bg-green-100/80 text-green-800 {% else %} bg-red-100/80 text-red-800 {% endif %}">
+                {{ prediction_text }}
+            </div>
+            {% if advice %}
+            <div class="mt-6 bg-yellow-100/80 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-lg">
+                <p class="font-bold">Advice for Improvement:</p>
+                <ul class="list-disc list-inside mt-2">
+                    {% for item in advice %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <div class="mt-8">
+                <canvas id="predictionChart"></canvas>
+            </div>
+            <script>
+                const ctx = document.getElementById('predictionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Attendance', 'Study Hours', 'Internal Marks', 'Assignment Score'],
+                        datasets: [{
+                            label: 'Student Input',
+                            data: [{{- attendance -}}, {{- study_hours -}}, {{- internal_marks -}}, {{- assignment_score -}}],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.6)',
+                                'rgba(255, 206, 86, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(153, 102, 255, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Student Performance Metrics for {{ student_name }}',
+                                font: {
+                                    size: 18,
+                                    family: 'Poppins'
+                                },
+                                color: '#333'
+                            }
+                        }
+                    }
+                });
+            </script>
+            {% endif %}
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

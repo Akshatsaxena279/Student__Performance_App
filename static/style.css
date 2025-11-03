@@ -1,0 +1,19 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+}
+
+.transition {
+    transition: all 0.2s ease-in-out;
+}
+
+.transform {
+    transform: scale(1);
+}
+
+.hover\:scale-105:hover {
+    transform: scale(1.05);
+}
