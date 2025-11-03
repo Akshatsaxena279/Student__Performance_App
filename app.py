@@ -120,5 +120,3 @@ def delete_student(student_name):
         df.to_csv('predictions.csv', index=False)
     return redirect(url_for('history'))
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
